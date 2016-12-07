@@ -2,9 +2,9 @@
 A webapp for the chair of "Professional qualification" at the Nacional Technology University (Arg).
 
 #Used Technologies:
-Java Server Faces
-Hibernate - MySQL
-Maven
+Java Server Faces,
+Hibernate - MySQL,
+Maven,
 Aditional libraries: PrimeFaces, JUnit
 
 Developers:
