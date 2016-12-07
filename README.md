@@ -1,5 +1,5 @@
 # SmartPS
-A webapp for the chair of "Professional qualification" at the Nacional Technology University (Arg).
+A rough webapp for the chair of "Professional qualification" at the Nacional Technology University (Arg).
 
 #Used Technologies:
 Java Server Faces,
