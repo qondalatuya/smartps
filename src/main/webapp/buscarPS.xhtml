@@ -1,0 +1,333 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:head>
+    	<title>SmartPS</title>
+    </h:head>
+    
+    <h:body >
+
+ 	<ui:composition template="/templates/template.xhtml">
+ 		<ui:define name="content"> 
+				<h3><p:outputLabel value="Buscar PS"/></h3>
+				<p:separator/>
+				<br></br>
+				<p:growl id="msgs" showDetail="true"/>
+				<p:panel id="ListadoPSs">
+					<p:dataTable id="pss" value="#{consultarPS.pss}" var="ps" selectionMode="single" selection="#{consultarPS.selectedPS}" rowKey="#{ps.id}" widgetVar="pssTable">
+					    <f:facet name="header">
+					 		<h3><p:outputLabel value=""/></h3>
+					    </f:facet>
+										    				
+						<p:column headerText="Título" filterBy="#{ps.titulo}" filterMatchMode="contains">
+							#{ps.titulo}
+						</p:column>
+						
+						<p:column headerText="Nombre Alumno" filterBy="#{ps.alumno.nombre}" filterMatchMode="contains">
+							#{ps.alumno.nombre}
+						</p:column>
+						
+						<p:column headerText="Legajo" filterBy="#{ps.alumno.legajo}">
+							#{ps.alumno.legajo}
+						</p:column>
+						
+						<p:column headerText="Estado" filterBy="#{ps.estado.nombre}" filterMatchMode="contains">
+							#{ps.estado.nombre}
+						</p:column>
+						
+						<p:column headerText="Area" filterBy="#{ps.area.nombre}" filterMatchMode="contains">
+							#{ps.area.nombre}
+						</p:column>
+						
+						<p:column headerText="Organizacion" filterBy="#{ps.organizacion.nombre}" filterMatchMode="contains">
+		
+							#{ps.organizacion.nombre}
+						</p:column>
+						
+						<p:column headerText="Tipo Actividad" filterBy="#{ps.tipoActividad.nombre}" filterMatchMode="contains">
+							#{ps.tipoActividad.nombre}
+						</p:column>
+						
+						<p:column headerText="Ciclo lectivo" filterBy="#{ps.cicloLectivo}">
+							#{ps.cicloLectivo}
+						</p:column>
+						
+						<p:column filterBy="#{ps.cuatrimestre}"  headerText="Cuatrimestre">						
+							#{ps.cuatrimestre}
+						</p:column>
+						
+				        <f:facet name="footer">
+				            <p:commandButton id="btnVerPresentaciones" update="@(.ui-panel)" icon="ui-icon-search" value="Ver detalles" actionListener="#{consultarPS.actualizarPresentacionesPS()}"/>
+				            <p:commandButton id="btnBuscarPlanes" update="@(.ui-datatable)" icon="ui-icon-pencil" value="Modificar planes" oncomplete="PF('dialogoPlanes').show()" actionListener="#{consultarPS.actualizarPlanes()}" />
+				            <p:commandButton id="btnBuscarInformes" update="@(.ui-datatable)" icon="ui-icon-pencil" value="Modificar informes" oncomplete="PF('dialogoInformes').show()" actionListener="#{consultarPS.actualizarInformes()}" />
+				            <p:commandButton id="btnModificarPS" update="@(.ui-panel)" icon="ui-icon-pencil" value="Modificar PS"  oncomplete="PF('dialogoModifPS').show()"  actionListener="#{consultarPS.actualizarPS()}" />
+				            
+				        </f:facet>				
+						  
+					</p:dataTable>
+				 </p:panel>
+				 <br></br>
+				
+				<p:panel id="DetallesPS" rendered="#{consultarPS.visibleDetalles}">
+					<p:fieldset legend="Datos del Alumno">
+						<p:panelGrid columns="2">
+							<p:outputLabel value="Nro de legajo"/>
+							<p:outputLabel value="#{consultarPS.detailedPS.alumno.legajo}" />
+							<p:outputLabel value="Nombre"/>
+							<p:outputLabel value="#{consultarPS.detailedPS.alumno.nombre}" />
+							<p:outputLabel value="Año de ingreso"/>
+							<p:outputLabel value="#{consultarPS.detailedPS.alumno.cicloLectivo}" />
+						</p:panelGrid>
+					</p:fieldset>
+					<br></br>
+					
+					<p:fieldset legend="Datos de la Práctica Supervisada" >
+						<p:panelGrid columns="2">
+							<p:outputLabel value="Titulo"/>
+							<p:outputLabel value="#{consultarPS.detailedPS.titulo}" />
+							<p:outputLabel value="Ciclo lectivo"/>
+							<p:outputLabel value="#{consultarPS.detailedPS.cicloLectivo}" />
+							<p:outputLabel value="Cuatrimestre"/>
+							<p:outputLabel value="#{consultarPS.detailedPS.cuatrimestre}" />
+							<p:outputLabel value="Tipo de actividad"/>
+							<p:outputLabel value="#{consultarPS.detailedPS.tipoActividad.nombre} - #{consultarPS.detailedPS.tipoActividad.descripsion}" />
+							<p:outputLabel value="Area"/>
+							<p:outputLabel value="#{consultarPS.detailedPS.area.nombre} - #{consultarPS.detailedPS.area.descripsion}" />
+							<p:outputLabel value="Organizacion"/>
+							<p:outputLabel value="#{consultarPS.detailedPS.organizacion.nombre} - #{consultarPS.detailedPS.organizacion.descripsion}" />
+							<p:outputLabel value="Estado"/>
+							<p:outputLabel value="#{consultarPS.detailedPS.estado.nombre} - #{consultarPS.detailedPS.estado.descripsion}" />
+						</p:panelGrid>
+					</p:fieldset>
+					<br></br>
+					
+					<p:fieldset legend="Presentaciones de Planes">
+						<p:dataTable value="#{consultarPS.planes}" var="plan" emptyMessage="no registra presentaciones de planes">
+							
+							<p:column headerText="Fecha de Presentación" >
+								<p:outputLabel value="#{plan.fechaDePresentacion}">
+	       							<f:convertDateTime type="date" locale="es_AR"/>
+	       						</p:outputLabel>
+							</p:column>
+							
+							<p:column headerText="Fecha de evaluación">
+								<p:outputLabel value="#{plan.fechaAprobDesaprob}">
+									<f:convertDateTime type="date" locale="es_AR"/>
+								</p:outputLabel>																										
+							</p:column>
+							
+							<p:column headerText="Observación">
+								<h:outputText value="#{plan.observaciones}" />
+							</p:column>
+							
+							<p:column headerText="Archivo adjunto">
+								<h:commandButton value="Ver archivo" action="#{consultarPS.updatePdf()}" update="pdf" disabled="#{plan.file==null}">
+									<f:param name="idPlan" value="#{plan.id}" />
+								</h:commandButton>
+							</p:column>
+						</p:dataTable>
+					</p:fieldset>
+					<p:panel header="Documento digital" id="pdf" toggleable="true" closable="true" rendered="#{consultarPS.renderedPlanDigital}" >
+								<object type="application/pdf" data="#{consultarPS.dirPlan}?pfdrid_c=true" width="100%" height="300px">
+								</object>
+					</p:panel>
+					<br></br>
+					
+					<p:fieldset legend="Presentaciones de Informes">
+						<p:dataTable value="#{consultarPS.informes}" var="informe" emptyMessage="no registra presentaciones de informes">
+							
+							<p:column headerText="Fecha de Presentación" >
+								<p:outputLabel value="#{informe.fechaDePresentacion}">
+	       							<f:convertDateTime type="date" locale="es_AR"/>
+	       						</p:outputLabel>
+							</p:column>
+							
+							<p:column headerText="Fecha de evaluación">
+								<p:outputLabel value="#{informe.fechaAprobDesaprob}">
+									<f:convertDateTime type="date" locale="es_AR"/>
+								</p:outputLabel>																										
+							</p:column>
+							
+							<p:column headerText="Observación">
+								<h:outputText value="#{informe.observaciones}" />
+							</p:column>
+							
+							<p:column headerText="Archivo adjunto">
+								<h:commandButton value="Ver archivo" action="#{consultarPS.updatePdfForInforme()}" update="pdf2" disabled="#{informe.file ==null}">
+									<f:param name="idInforme" value="#{informe.id}" />
+								</h:commandButton>
+							</p:column>
+						</p:dataTable>
+						<p:panel header="Documento digital" id="pdf2" toggleable="true" closable="true" visible="#{consultarPS.renderedInformeDigital}" rendered="#{consultarPS.renderedInformeDigital}" >
+								<object type="application/pdf" data="#{consultarPS.dirInformeDigital}?pfdrid_c=true" width="100%" height="300px">
+								</object>
+						</p:panel>
+					</p:fieldset>
+				</p:panel>
+				
+				<p:dialog widgetVar="dialogoPlanes">
+					<p:outputPanel id="planes" >
+						<p:dataTable value="#{consultarPS.planes}" var="plan" style="width:600px" editable="true" emptyMessage="no registra presentaciones de planes">
+							<p:ajax event="rowEdit" listener="#{consultarPS.editarColumnaPlan}" update="@(.ui-growl)" />
+							<p:ajax event="rowEditCancel" listener="#{consultarPS.cancelarEdicionColumna}" update="@(.ui-growl)" />	
+							
+							<p:column headerText="Fecha de presentación">
+	       						
+
+								<p:cellEditor>
+	       							<f:facet name="output">
+			       						<p:outputLabel value="#{plan.fechaDePresentacion}">
+			       							<f:convertDateTime type="date" locale="es_AR"/>
+			       						</p:outputLabel>	       							
+	       							</f:facet>
+	       							<f:facet name="input">
+	       								<p:calendar value="#{plan.fechaDePresentacion}"/>	
+	       							</f:facet>
+	       						
+	       						</p:cellEditor>
+							</p:column>	
+							
+							<p:column headerText="Fecha de evaluación">
+								<p:cellEditor>
+									<f:facet name="output">
+										<p:outputLabel value="#{plan.fechaAprobDesaprob}">
+											<f:convertDateTime type="date" locale="es_AR"/>
+										</p:outputLabel>									
+									</f:facet>
+									<f:facet name="input">
+										<p:calendar value="#{plan.fechaAprobDesaprob}"/>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							
+							<p:column headerText="Observación">
+								<p:cellEditor>
+									<f:facet name="output"><h:outputText value="#{plan.observaciones}" /></f:facet>
+	               					<f:facet name="input"><p:inputText id="modelInput" value="#{plan.observaciones}" style="width:100%"/></f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column>
+							    <p:rowEditor/>
+							</p:column>
+							
+							
+						</p:dataTable>
+					</p:outputPanel>						
+				</p:dialog>
+				
+				<p:dialog widgetVar="dialogoInformes" >
+					<p:outputPanel id="informes" >
+						<p:dataTable value="#{consultarPS.informes}" var="informe" style="width:600px" editable="true" emptyMessage="no registra presentaciones de informes">
+							<p:ajax event="rowEdit" listener="#{consultarPS.editarColumnaInforme}" update="@(.ui-growl)" />
+							<p:ajax event="rowEditCancel" listener="#{consultarPS.cancelarEdicionColumna}" update="@(.ui-growl)" />
+									
+							<p:column headerText="Fecha de presentación">
+	       						<p:cellEditor>
+	       							<f:facet name="output">
+	       								<p:outputLabel value="#{informe.fechaDePresentacion}">
+			       							<f:convertDateTime type="date" locale="es_AR"/>
+			       						</p:outputLabel>	
+	       							</f:facet>
+	       							
+	       							<f:facet name="input">
+	       								<p:calendar value="#{informe.fechaDePresentacion}" />
+	       							</f:facet>
+	       						</p:cellEditor>
+							</p:column>
+							
+							<p:column headerText="Fecha de evaluación">
+								<p:cellEditor>
+									<f:facet name="output">
+										<p:outputLabel value="#{informe.fechaAprobDesaprob}">
+											<f:convertDateTime type="date" locale="es_AR"/>
+										</p:outputLabel>									
+									</f:facet>
+									
+									<f:facet name="input">
+										<p:calendar value="#{informe.fechaAprobDesaprob}"/>
+									</f:facet>
+							
+								</p:cellEditor>
+							</p:column>
+							
+							
+							<p:column headerText="Observación">
+								<p:cellEditor>
+									<f:facet name="output"><h:outputText value="#{informe.observaciones}" /></f:facet>
+	               					<f:facet name="input"><p:inputText id="modelInput" value="#{informe.observaciones}" style="width:100%"/></f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column>
+							    <p:rowEditor/>
+							</p:column>
+							
+							
+						</p:dataTable>
+					</p:outputPanel>						
+				</p:dialog>
+				
+				<p:dialog widgetVar="dialogoModifPS" header="Modificar PS">
+					
+						<p:panel id="panelEdicionPS" autoUpdate="true" >
+							<p:panelGrid columns="2">
+								<p:outputLabel value="Titulo"/>
+								<p:inputText value="#{consultarPS.modifPS.titulo}" />
+								<p:outputLabel value="Ciclo lectivo"/>
+								<p:inputText value="#{consultarPS.modifPS.cicloLectivo}" />								
+								<p:outputLabel value="Cuatrimestre"/>
+								<p:inputText value="#{consultarPS.modifPS.cuatrimestre}" />
+				        		
+				        		<p:outputLabel value="Tipo" />			        		
+				        		<p:selectOneMenu value="#{consultarPS.actSelec}"  >
+				        			<p:ajax listener="#{consultarPS.cambioAct}" />
+				        			<f:selectItems value="#{tipoActBean.tiposAct}" var="act" itemLabel="#{act.nombre}" itemValue="#{act.id}" itemDescription="#{act.descripsion}"/>
+				        		</p:selectOneMenu>
+				        		
+				        		<p:outputLabel value="Area" />
+								<p:selectOneMenu value="#{consultarPS.areaSelec}">
+									<p:ajax listener="#{consultarPS.cambioArea}" />
+									<f:selectItem itemLabel="Seleccione uno" itemValue="" />
+									<f:selectItems value="#{areaBean.areas}" var="area" itemLabel="#{area.nombre}" itemValue="#{area.id}" itemDescription="#{area.descripsion}" />							
+								</p:selectOneMenu>
+								
+			        			<p:outputLabel value="Organización:" />
+			        			<p:selectOneMenu value="#{consultarPS.orgSelec}" filter="true">
+				        			<p:ajax listener="#{consultarPS.cambioOrg}" />
+				        			<f:selectItem itemLabel="Seleccione uno" itemValue="" noSelectionOption="true" />
+				        			<f:selectItems value="#{orgBean.organizaciones}" var="org" itemLabel="#{org.nombre}" itemValue="#{org.id}"  itemDescription="#{org.descripsion}"/>
+			        			</p:selectOneMenu>								
+								
+								<p:commandButton value="Guardar cambios" update="@(.ui-panel)" actionListener="#{consultarPS.guardarCambiosPS()}" oncomplete="PF('dialogoModifPS').hide()" >
+									<p:confirm header="Confirmación" message="Desea guardar los cambios?" icon="ui-icon-alert"/>
+								</p:commandButton>																
+							</p:panelGrid>
+							<p:separator />
+					
+							<p:commandButton value="Cancelar PS" update="@(.ui-panel)" disabled="#{consultarPS.puedeCancelarPS == false}" actionListener="#{consultarPS.cancelarPS()}" >
+								<p:confirm header="Confirmación" message="Seguro desea dar la PS por cancelada?" icon="ui-icon-alert"/>
+							</p:commandButton>
+							
+							<p:commandButton value="Aprobar PS" update="@(.ui-panel)" disabled="#{consultarPS.puedeAprobarPS == false}" actionListener="#{consultarPS.aprobarPS()}" >
+								<p:confirm header="Confirmación" message="Seguro desea dar la PS por aprobada?" icon="ui-icon-alert"/>
+							</p:commandButton>
+						</p:panel>
+				</p:dialog>
+				
+			    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+			        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+			        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+			    </p:confirmDialog>
+
+
+
+ 		</ui:define>
+ 		 
+ 	</ui:composition>
+
+    </h:body>
+</html>
